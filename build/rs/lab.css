@@ -1,0 +1,16 @@
+:root{--bg:#0f0b18;--panel:#1b1429;--panel2:#261b3b;--line:#3a2d55;--tx:#f1ebff;--dim:#a99dc7;--g:#b26bff;--g2:#d9acff;--pink:#e06aa8;--ok:#7be0a4;--err:#ff7a9a;--blue:#6bb6ff;--tonal:#33244f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font:14px/1.5 Roboto,system-ui,sans-serif;margin:0;padding:8px;background:var(--bg);color:var(--tx)}
+h2{margin:0 0 4px;font-size:17px;font-weight:600}h3{margin:0 0 4px;font-size:14px;font-weight:500}
+.k{color:var(--dim)}.ok{color:var(--ok)}.bad{color:var(--err)}code{background:var(--panel2);border-radius:5px;padding:0 4px;font-family:ui-monospace,Menlo,monospace}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:8px 0}
+button{font:500 14px/1 Roboto,system-ui,sans-serif;border:0;border-radius:20px;min-height:38px;padding:0 16px;background:var(--g);color:#22083d;margin:3px 4px 3px 0;cursor:pointer}
+button.s{background:var(--tonal);color:#eadbff}button:disabled{opacity:.4}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0}.chip{flex:none;background:var(--tonal);color:#eadbff;min-height:34px;padding:0 12px}.chip.on{background:var(--g);color:#22083d}.chip.done{outline:1px solid var(--ok)}
+.ed{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#120d1e;max-height:46vh;overflow-y:auto;margin:6px 0}
+#gut{margin:0;padding:8px 6px 8px 8px;color:#6c5f8c;text-align:right;font:13px/1.45 ui-monospace,Menlo,monospace;background:#16102a;user-select:none;min-width:34px;transform:none}
+#src{flex:1;min-height:150px;border:0;outline:0;resize:none;background:transparent;color:#f1ebff;padding:8px;font:13px/1.45 ui-monospace,Menlo,monospace;white-space:pre;overflow:hidden}
+.ed{align-items:flex-start}#src{height:auto}
+.out{margin:6px 0;white-space:pre-wrap;word-break:break-word;font:13px/1.45 ui-monospace,Menlo,monospace;background:#120d1e;border-radius:10px;padding:8px;min-height:42px;max-height:50vh;overflow:auto}
+.out .e{color:var(--err)}
+.lg{font-size:13px;padding:2px 0}.lg.mv b{color:var(--pink)}.lg.br b{color:var(--blue)}.lg.dp b{color:var(--ok)}

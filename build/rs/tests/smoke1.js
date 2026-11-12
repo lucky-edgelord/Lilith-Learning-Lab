@@ -1,0 +1,20 @@
+const RL=require('../rustlab.core.js');
+function t(name,src,exp){const r=RL.run(src);const got=r.stdout+(r.stderr?'|ERR:'+r.stderr.split('\n').slice(0,3).join('/'):'');console.log((exp===undefined||got.startsWith(exp)?'ok  ':'FAIL')+' '+name+' => '+JSON.stringify(got).slice(0,200));}
+t('hello','fn main(){ println!("Hello, {}!", "world"); }','Hello, world!');
+t('vars','fn main(){ let mut x = 5; x += 2; let y: u8 = 250; println!("{x} {} {:?} {:>4}|", y, 1.0, 3); }','7 250 1.0    3|');
+t('move','fn main(){ let s1 = String::from("hi"); let s2 = s1; println!("{}", s1); }','');
+t('borrow','fn len(s:&String)->usize{ s.len() } fn main(){ let s = String::from("hello"); let n = len(&s); println!("{} {}", s, n); }','hello 5');
+t('struct','#[derive(Debug,Clone)] struct P{x:i32,y:i32} impl P{ fn new(x:i32,y:i32)->P{P{x,y}} fn sum(&self)->i32{self.x+self.y} fn bump(&mut self){self.x+=1;} } fn main(){ let mut p=P::new(1,2); p.bump(); println!("{:?} {}", p, p.sum()); }','P { x: 2, y: 2 } 3');
+t('enum','enum S{C(f64),R{w:f64,h:f64}} fn area(s:&S)->f64{ match s { S::C(r)=>3.14*r*r, S::R{w,h}=>w*h } } fn main(){ println!("{} {}", area(&S::C(2.0)), area(&S::R{w:2.0,h:3.0})); }','12.56 6');
+t('vec','fn main(){ let mut v=vec![1,2,3]; v.push(4); let s:i32=v.iter().map(|x| x*2).sum(); println!("{:?} {}", v, s); for (i,x) in v.iter().enumerate(){ if i==1 {println!("{}",x);} } }','[1, 2, 3, 4] 20');
+t('hashmap','use std::collections::HashMap; fn main(){ let mut m=HashMap::new(); for w in "a b a".split_whitespace(){ *m.entry(w).or_insert(0)+=1; } println!("{} {}", m["a"], m.len()); }','2 2');
+t('opt','fn d(a:i32,b:i32)->Option<i32>{ if b==0 {None} else {Some(a/b)} } fn main(){ println!("{:?} {:?}", d(6,3), d(1,0)); if let Some(x)=d(8,2){println!("{}",x);} }','Some(2) None');
+t('res','fn p(s:&str)->Result<i32,String>{ let n:i32 = s.parse().map_err(|_| String::from("bad"))?; Ok(n*2) } fn main(){ println!("{:?} {:?}", p("21"), p("x")); }','Ok(42) Err("bad")');
+t('panic','fn main(){ let v=vec![1]; println!("{}", v[5]); }','');
+t('immut','fn main(){ let x=1; x=2; }','');
+t('mutborrow','fn main(){ let s=String::new(); s.push_str("a"); }','');
+t('overflow','fn main(){ let x:u8=255; let y=x+1; println!("{}",y); }','');
+t('trait','trait A{fn n(&self)->String; fn hi(&self)->String{ format!("hi {}", self.n()) }} struct D; impl A for D{ fn n(&self)->String{String::from("dog")} } fn main(){ let b:Vec<Box<dyn A>>=vec![Box::new(D)]; for x in b.iter(){ println!("{}", x.hi()); } }','hi dog');
+t('drop','struct D(i32); impl Drop for D{ fn drop(&mut self){ println!("drop {}", self.0); } } fn main(){ let _a=D(1); { let _b=D(2); } println!("end"); }','drop 2\nend\ndrop 1');
+t('while','fn main(){ let mut n=0; while n<3 { n+=1; } let r = loop { n+=1; if n>5 {break n*2;} }; println!("{}", r); }','12');
+t('closure','fn main(){ let k=3; let f=|x:i32| x+k; println!("{}", f(4)); let v:Vec<i32>=(1..=5).filter(|x| x%2==1).collect(); println!("{:?}", v); }','7\n[1, 3, 5]');
