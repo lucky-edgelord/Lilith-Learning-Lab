@@ -178,6 +178,8 @@
     if (v instanceof RSet) { var ss = []; v.m.forEach(function (e) { ss.push(debug(e[0], pretty, ind + 4)); }); return seq('{', '}', ss); }
     if (v instanceof Struct || v instanceof Enum) {
       var ud = V.userDebug && V.userDebug(v); if (ud != null) return ud;
+      var tnm = v instanceof Struct ? v.st : v.en, dd = V.derives[tnm];
+      if (dd && dd.indexOf('Debug') < 0 && dd.indexOf('impl:Debug') < 0 || (!dd && V.enumDefs && V.enumDefs[tnm] !== undefined && tnm !== 'Ordering')) throw new RL.RustError('E0277', '`' + tnm + '` doesn\'t implement `Debug`', 0, 0, { help: 'the trait `Debug` is not implemented for `' + tnm + '`; add `#[derive(Debug)]` to the ' + (v instanceof Struct ? 'struct' : 'enum') + ' `' + tnm + '` or manually `impl Debug for ' + tnm + '`' });
       var name, tup, fields;
       if (v instanceof Struct) { name = v.st; if (v.tuple) { tup = v.o.map(function (k) { return v.f[k]; }); } else fields = v.o.map(function (k) { return [k, v.f[k]]; }); }
       else { name = v.vn; if (v.names) fields = v.names.map(function (k, i) { return [k, v.v[i]]; }); else if (v.v.length) tup = v.v; }

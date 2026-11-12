@@ -795,7 +795,7 @@
         if (nm === 'Some' || nm === 'Ok' || nm === 'Err') return new Fn(function (a) { return new Enum(nm === 'Some' ? 'Option' : 'Result', nm, [a[0]]); }, nm);
         if (structs[nm] && !structs[nm].fields && !structs[nm].tuple) return new Struct(nm, {}, []);
         if (structs[nm] && structs[nm].tuple) return new Fn(function (a) { var f = {}, o = []; a.forEach(function (x, i) { f[i] = x; o.push(String(i)); }); var s = new Struct(nm, f, o); s.tuple = true; return s; }, nm);
-        for (var en in enums) { var vd = enums[en].variants.filter(function (v) { return v.name === nm; })[0]; if (vd && ST.importedVariants) return variantVal(en, vd); }
+        for (var en in enums) { var vd = enums[en].variants.filter(function (v) { return v.name === nm; })[0]; if (vd) return variantVal(en, vd); }
         err('E0425', 'cannot find value `' + nm + '` in this scope', n, { labels: [{ line: n.line, col: n.col, len: nm.length, primary: true, text: 'not found in this scope' }], help: similar(nm, env) });
       }
       var tyn = segs[segs.length - 2], last = segs[segs.length - 1];

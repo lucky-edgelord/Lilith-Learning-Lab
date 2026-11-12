@@ -536,6 +536,8 @@ var RL = {};
     if (v instanceof RSet) { var ss = []; v.m.forEach(function (e) { ss.push(debug(e[0], pretty, ind + 4)); }); return seq('{', '}', ss); }
     if (v instanceof Struct || v instanceof Enum) {
       var ud = V.userDebug && V.userDebug(v); if (ud != null) return ud;
+      var tnm = v instanceof Struct ? v.st : v.en, dd = V.derives[tnm];
+      if (dd && dd.indexOf('Debug') < 0 && dd.indexOf('impl:Debug') < 0 || (!dd && V.enumDefs && V.enumDefs[tnm] !== undefined && tnm !== 'Ordering')) throw new RL.RustError('E0277', '`' + tnm + '` doesn\'t implement `Debug`', 0, 0, { help: 'the trait `Debug` is not implemented for `' + tnm + '`; add `#[derive(Debug)]` to the ' + (v instanceof Struct ? 'struct' : 'enum') + ' `' + tnm + '` or manually `impl Debug for ' + tnm + '`' });
       var name, tup, fields;
       if (v instanceof Struct) { name = v.st; if (v.tuple) { tup = v.o.map(function (k) { return v.f[k]; }); } else fields = v.o.map(function (k) { return [k, v.f[k]]; }); }
       else { name = v.vn; if (v.names) fields = v.names.map(function (k, i) { return [k, v.v[i]]; }); else if (v.v.length) tup = v.v; }
@@ -1378,7 +1380,7 @@ var RL = {};
         if (nm === 'Some' || nm === 'Ok' || nm === 'Err') return new Fn(function (a) { return new Enum(nm === 'Some' ? 'Option' : 'Result', nm, [a[0]]); }, nm);
         if (structs[nm] && !structs[nm].fields && !structs[nm].tuple) return new Struct(nm, {}, []);
         if (structs[nm] && structs[nm].tuple) return new Fn(function (a) { var f = {}, o = []; a.forEach(function (x, i) { f[i] = x; o.push(String(i)); }); var s = new Struct(nm, f, o); s.tuple = true; return s; }, nm);
-        for (var en in enums) { var vd = enums[en].variants.filter(function (v) { return v.name === nm; })[0]; if (vd && ST.importedVariants) return variantVal(en, vd); }
+        for (var en in enums) { var vd = enums[en].variants.filter(function (v) { return v.name === nm; })[0]; if (vd) return variantVal(en, vd); }
         err('E0425', 'cannot find value `' + nm + '` in this scope', n, { labels: [{ line: n.line, col: n.col, len: nm.length, primary: true, text: 'not found in this scope' }], help: similar(nm, env) });
       }
       var tyn = segs[segs.length - 2], last = segs[segs.length - 1];
@@ -2169,6 +2171,26 @@ var RL = {};
       }
     });
   }
+
+  function directlyContains(t, name) { if (!t) return false; if (t.k === 'tpath') { if (t.name === name) return true; if (t.name === 'Option') return t.args.some(function (a) { return directlyContains(a, name); }); return false; } if (t.k === 'ttuple') return t.items.some(function (a) { return directlyContains(a, name); }); if (t.k === 'tarray') return directlyContains(t.el, name); return false; }
+  function checkRecursive(items) {
+    items.forEach(function (it) {
+      var tys = null;
+      if (it.k === 'enum') tys = [].concat.apply([], it.variants.map(function (v) { return v.tys.concat(v.fields.map(function (f) { return f.ty; })); }));
+      else if (it.k === 'struct') tys = (it.fields || []).map(function (f) { return f.ty; }).concat(it.tuple || []);
+      if (tys && tys.some(function (t) { return directlyContains(t, it.name); })) E('E0072', 'recursive type `' + it.name + '` has infinite size', it, { labels: [{ line: it.line, col: it.col, len: 4, primary: true, text: 'recursive type has infinite size' }], help: 'insert some indirection (e.g., a `Box`, `Rc`, or `&`) to break the cycle: `Box<' + it.name + '>`' });
+    });
+  }
+  function checkTraitImpls(items) {
+    var traits = {};
+    items.forEach(function (it) { if (it.k === 'trait') traits[it.name] = it; });
+    items.forEach(function (it) {
+      if (it.k !== 'impl' || !it.trait || !traits[it.trait]) return;
+      var have = {}; it.items.forEach(function (f) { if (f.k === 'fn') have[f.name] = 1; });
+      var miss = traits[it.trait].items.filter(function (f) { return !f.body && !have[f.name]; }).map(function (f) { return '`' + f.name + '`'; });
+      if (miss.length) E('E0046', 'not all trait items implemented, missing: ' + miss.join(', '), it, { labels: [{ line: it.line, col: it.col, len: 4, primary: true, text: 'missing ' + miss.join(', ') + ' in implementation' }], help: 'implement the missing item: `fn ' + miss[0].replace(/`/g, '') + '(..) { todo!() }`' });
+    });
+  }
   RL.check = function (ast, lines) {
     var enums = {};
     function collect(items) { items.forEach(function (it) { if (it.k === 'enum') enums[it.name] = it; if (it.k === 'mod') collect(it.items); if (it.k === 'impl') it.items.forEach(function (f) { if (f.k === 'fn' && f.selfKind === 'mut') userMut[f.name] = 1; }); }); }
@@ -2176,6 +2198,7 @@ var RL = {};
     function fnsOf(items, out) { items.forEach(function (it) { if (it.k === 'fn') out.push(it); else if (it.k === 'impl') it.items.forEach(function (f) { if (f.k === 'fn') out.push(f); }); else if (it.k === 'trait') it.items.forEach(function (f) { if (f.k === 'fn') out.push(f); }); else if (it.k === 'mod') fnsOf(it.items, out); }); return out; }
     var all = fnsOf(ast.items, []);
     ast.items.forEach(function (it) { if (it.k === 'struct' && it.fields) { var gl = it.gen || []; it.fields.forEach(function (f) { var un = unnamedRef(f.ty); if (un) E('E0106', 'missing lifetime specifier', un, { labels: [{ line: un.line, col: un.col, len: 1, primary: true, text: 'expected named lifetime parameter' }], help: 'consider introducing a named lifetime parameter: `struct ' + it.name + '<\'a>` with `&\'a ' + RL.typeStr(un.to) + '`' }); }); } });
+    checkRecursive(ast.items); checkTraitImpls(ast.items);
     all.forEach(function (f) { checkFnSig(f, lines); });
     all.forEach(function (f) {
       if (!f.body) return;

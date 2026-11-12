@@ -1,0 +1,7 @@
+{"course": [
+ {"title": "The Rust Programming Language (the Book)", "url": "https://doc.rust-lang.org/book/", "note": "The official free book. Dual licensed MIT or Apache 2.0. Our course follows a similar order but uses our own words and examples."},
+ {"title": "Rust by Example", "url": "https://doc.rust-lang.org/rust-by-example/", "note": "Runnable examples for every feature."},
+ {"title": "The Rust standard library documentation", "url": "https://doc.rust-lang.org/std/", "note": "Look up any method used in the labs."},
+ {"title": "Rustlings", "url": "https://github.com/rust-lang/rustlings", "note": "Small exercises to practise on your own computer."},
+ {"title": "The Rust Error Index", "url": "https://doc.rust-lang.org/error_codes/error-index.html", "note": "Explains every error code such as E0382, E0499 and E0502."}
+], "chapters": {}}

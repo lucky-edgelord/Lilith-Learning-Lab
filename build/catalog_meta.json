@@ -438,5 +438,17 @@
    "research paper",
    "python"
   ]
+ ],
+ "rust-for-beginners": [
+  "Computer Science",
+  "Beginner",
+  [
+   "rust",
+   "programming",
+   "ownership",
+   "borrowing",
+   "systems",
+   "labs"
+  ]
  ]
 }
