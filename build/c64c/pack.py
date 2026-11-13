@@ -1,7 +1,8 @@
 """Pack files into one gzip blob (path, data records) and base64 it for embedding in webxdc apps."""
 import gzip, base64, struct, os
-W = "/home/claude/8bitworkshop/8bitworkshop/"
-ZIP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tc", "zip", "share", "cc65")
+HERE = os.path.dirname(os.path.abspath(__file__))
+WASM = os.path.join(HERE, "..", "vendor", "cc65-wasm")
+ZIP = os.path.join(HERE, "tc", "zip", "share", "cc65")
 
 
 def pack(files):
@@ -12,14 +13,10 @@ def pack(files):
     return base64.b64encode(gzip.compress(out, 9)).decode()
 
 
-def emu_blob():
-    return pack([("c64.wasm", open(W + "res/c64/c64.wasm", "rb").read()), ("c64.bios", open(W + "res/c64/c64.bios", "rb").read())])
-
-
 def tools_blob():
     fl = []
     for t in ("cc65", "ca65", "ld65"):
-        fl.append((t + ".wasm", open(W + "src/worker/wasm/%s.wasm" % t, "rb").read()))
+        fl.append((t + ".wasm", open(os.path.join(WASM, t + ".wasm"), "rb").read()))
     for sub in ("include", "cfg"):
         for root, _, fs in os.walk(os.path.join(ZIP, sub)):
             for f in fs:
@@ -36,5 +33,4 @@ def tools_blob():
 
 
 if __name__ == "__main__":
-    a = emu_blob(); b = tools_blob()
-    print(len(a), len(b))
+    print(len(tools_blob()))

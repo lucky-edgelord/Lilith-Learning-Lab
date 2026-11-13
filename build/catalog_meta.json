@@ -141,16 +141,20 @@
  ],
  "commodore-64-programming": [
   "Computer Science",
-  "Intermediate",
+  "Beginner",
   [
    "commodore 64",
-   "6502",
-   "assembly",
    "BASIC",
-   "C",
-   "retro",
+   "beginner",
    "sprites",
    "SID",
+   "joystick",
+   "user port",
+   "6502",
+   "assembly",
+   "C",
+   "cc65",
+   "retro",
    "emulator"
   ]
  ],
