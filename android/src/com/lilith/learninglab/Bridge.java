@@ -1,6 +1,5 @@
 package com.lilith.learninglab;
 
-import android.speech.tts.TextToSpeech;
 import android.webkit.JavascriptInterface;
 
 /** JavaScript bridge: window.AndroidTTS.speak(text, rate, id) / stop() / isReady() / copy(text) / share(title, text) / fetchUrl(url, id) / httpStart(...) / httpAbort(id). Runs on a WebView background thread. */
@@ -9,19 +8,16 @@ class Bridge {
     Bridge(MainActivity a) { this.a = a; }
 
     @JavascriptInterface
-    public void speak(String text, float rate, int id) {
-        if (!a.ttsReady) { a.event("u" + id, "error"); return; }
-        float r = Math.max(0.5f, Math.min(2.5f, rate));
-        a.tts.setSpeechRate(r);
-        int res = a.tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "u" + id);
-        if (res != TextToSpeech.SUCCESS) a.event("u" + id, "error");
-    }
+    public void speak(String text, float rate, int id) { a.speaker.speak(text, rate, id); }
 
     @JavascriptInterface
-    public void stop() { if (a.tts != null) a.tts.stop(); }
+    public void stop() { a.speaker.stop(); }
 
     @JavascriptInterface
-    public boolean isReady() { return a.ttsReady; }
+    public boolean isReady() { return a.speaker.isReady(); }
+
+    @JavascriptInterface
+    public void restartEngine() { a.speaker.restart(); }
 
     @JavascriptInterface
     public void copy(final String text) {

@@ -467,13 +467,14 @@ const btn = (id, icon, label, cls) => '<button class="btn ' + (cls || '') + '" i
 const FR = {}; ['neutral', 'happy', 'shy', 'mad', 'sad'].forEach(e => [1, 2, 3, 4].forEach(n => { const i = new Image(); i.src = 'avatar/' + e + n + '.webp'; FR[e + n] = i; }));
 let lastFrame = '';
 const AV = N.createAvatar((emo, n) => { const f = 'avatar/' + emo + n + '.webp'; if (f === lastFrame) return; lastFrame = f; $$('img.teacher').forEach(i => i.setAttribute('src', f)); });
-const ENV = N.makeEnv(window);
+const ENV = N.makeEnv(window, { onFocusLoss: why => { if (NAR && NAR.state.playing) { NAR.pause(); if (why === 'focusloss') toast('Another app took the sound, so Teacher paused.'); } } });
 let mode = null, LEC = null, READ = null;
 const NAR = N.createNarrator(ENV, {
   onChunk: (i, c) => { AV.emotion(c.emotion || 'neutral'); if (mode === 'lecture') lecShow(i); else if (mode === 'read') dockShow(c); },
   onSpeaking: on => { AV.speaking(on); $$('.teacherBox').forEach(b => b.classList.toggle('talk', on)); },
   onWord: () => AV.word(),
   onState: s => syncControls(s),
+  onFail: why => { toast(why + ' Tap play to try again.'); try { if (window.AndroidTTS && AndroidTTS.restartEngine) AndroidTTS.restartEngine(); } catch (e) {} },
   onDone: () => { if (mode === 'lecture' && LEC && !LEC.tour && ST.set.autoNext) { const nx = nextChapter(LEC.ch.n); if (nx) openLecture(nx.n, true); } }
 });
 AV.start();
@@ -484,6 +485,8 @@ function syncControls(s) {
   const m = $('#lmeta'); if (m && LEC) m.textContent = (s.i + 1) + ' / ' + s.n;
   const pr = $('#lprog'); if (pr && s.n) pr.style.width = Math.round(100 * (s.i + 1) / s.n) + '%';
 }
+document.addEventListener('visibilitychange', () => { if (document.hidden && NAR.state.playing) NAR.pause(); });
+window.addEventListener('pagehide', () => { try { NAR.pause(); } catch (e) {} });
 NAR.setRate(ST.set.rate);
 if (ENV.setVoice && ST.set.voice) ENV.setVoice(ST.set.voice);
 
@@ -1620,10 +1623,11 @@ $('#gear').onclick = () => {
     (voices.length > 1 ? '<div class="set"><span>Voice</span><select id="vsel">' + voices.map(v => '<option ' + (v.name === ST.set.voice ? 'selected' : '') + '>' + esc(v.name) + '</option>').join('') + '</select></div>' : '') +
     '<div class="set"><span>AI: office hours and course builder</span>' + btn('aiset', 'tune', 'AI settings', 'sm') + '</div>' +
     '<div class="set"><span>Settings file</span><span class="row">' + btn('sexp', 'share', 'Export', 'sm') + btn('simp', 'upload_file', 'Import', 'sm') + '</span></div>' +
-    '<div class="row end" style="margin-top:12px">' + btn('vtest', 'volume_up', 'Test voice', '') + btn('vclose', 'check', 'Done', 'pri') + '</div>';
+    '<div class="row end" style="margin-top:12px">' + btn('vtest', 'volume_up', 'Test voice', '') + btn('vlog', 'content_copy', 'Copy audio log', 'tonal') + btn('vclose', 'check', 'Done', 'pri') + '</div>';
   $$('[data-k]', d).forEach(b => b.onclick = () => { const k = b.dataset.k; ST.set[k] = !ST.set[k]; save(); b.classList.toggle('on', ST.set[k]); });
   $$('[data-r]', d).forEach(b => b.onclick = () => { ST.set.rate = +b.dataset.r; save(); NAR.setRate(ST.set.rate); $$('[data-r]', d).forEach(x => x.classList.toggle('on', x === b)); const lr = $('#lrate'); if (lr) lr.textContent = ST.set.rate + 'x'; });
   const vs = $('#vsel'); if (vs) vs.onchange = () => { ST.set.voice = vs.value; save(); ENV.setVoice(vs.value); };
+  $('#vlog').onclick = () => copyText('Voice engine: ' + ENV.kind + '\n' + N.diagText(), 'Audio log');
   $('#vtest').onclick = () => { NAR.stop(); mode = 'read'; NAR.load([{ label: 'Test', text: 'Hello, I am Teacher. Welcome to the Lilith Learning Lab.', shown: 'Hello, I am Teacher.', emotion: 'happy' }], 0); NAR.play(); };
   $('#aiset').onclick = () => { d.close(); openAISettings(); };
   $('#sexp').onclick = () => { d.close(); exportSettings(); };
@@ -1639,7 +1643,7 @@ $('#gear').onclick = () => {
   try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
   if (t) setTimeout(() => importText(t, 'course.json'), 300);
 })();
-window.__app = { NAR, AV, ST, K, readCourse, openLecture, openCourse, importText, go, get LEC() { return LEC; }, get CUR() { return CUR; }, get EXAM() { return EXAM; }, ENV, answerQuiz, openLab, openTour };
+window.__app = { N, NAR, AV, ST, K, readCourse, openLecture, openCourse, importText, go, get LEC() { return LEC; }, get CUR() { return CUR; }, get EXAM() { return EXAM; }, ENV, answerQuiz, openLab, openTour };
 coursesReady.catch(() => {}).then(() => { setCourse(ST.current || (ST.courses[0] && ST.courses[0].id)); render(); });
 })();
 </script>

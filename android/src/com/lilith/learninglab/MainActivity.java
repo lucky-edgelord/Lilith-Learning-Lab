@@ -3,8 +3,6 @@ package com.lilith.learninglab;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
@@ -13,18 +11,15 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.util.Locale;
-
 /**
  * Lilith Learning Lab: a standalone, offline Android app.
  * Courses are imported as JSON files; lectures, concept maps, quizzes and practice labs run as a local web page (assets/index.html) in a WebView.
  * Teacher's voice uses Android's built-in text-to-speech engine through the AndroidTTS bridge below.
  */
-public class MainActivity extends Activity implements TextToSpeech.OnInitListener {
+public class MainActivity extends Activity {
     WebView web;
     private FileChooser chooser;
-    TextToSpeech tts;
-    volatile boolean ttsReady = false;
+    Speaker speaker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +48,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         web.addJavascriptInterface(new Bridge(this), "AndroidTTS");
         setContentView(web);
 
-        tts = new TextToSpeech(this, this);
+        speaker = new Speaker(this);
         web.loadUrl("file:///android_asset/index.html");
     }
 
@@ -62,23 +57,22 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         if (req == FileChooser.REQ && chooser != null) chooser.result(code, data); else super.onActivityResult(req, code, data);
     }
 
-    @Override
-    public void onInit(int status) {
-        if (status != TextToSpeech.SUCCESS) { ttsReady = false; return; }
-        int r = tts.setLanguage(Locale.US);
-        if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) tts.setLanguage(Locale.getDefault());
-        tts.setPitch(1.05f);
-        tts.setOnUtteranceProgressListener(new Progress(this));
-        ttsReady = true;
-    }
-
     void keepAwake(final boolean on) {
         runOnUiThread(() -> web.setKeepScreenOn(on));
     }
 
-    void event(String utteranceId, final String type) {
+    void event(String utteranceId, final String type, final String code) {
         final String id = utteranceId.startsWith("u") ? utteranceId.substring(1) : utteranceId;
-        runOnUiThread(() -> web.evaluateJavascript("window.__ttsEvent&&window.__ttsEvent(" + id + ",'" + type + "')", null));
+        final String c = code == null ? "" : ",'" + code.replace("'", "") + "'";
+        runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.__ttsEvent&&window.__ttsEvent(" + id + ",'" + type + "'" + c + ")", null); });
+    }
+
+    /** Leaving the app (home, call, another app): stop talking and tell the page so the Teacher pauses instead of racing on. */
+    @Override
+    protected void onPause() {
+        if (speaker != null) speaker.stop();
+        event("u0", "pause", null);
+        super.onPause();
     }
 
     @Override
@@ -90,7 +84,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     @Override
     protected void onDestroy() {
-        if (tts != null) { tts.stop(); tts.shutdown(); }
+        if (speaker != null) speaker.shutdown();
         if (web != null) { web.destroy(); }
         super.onDestroy();
     }

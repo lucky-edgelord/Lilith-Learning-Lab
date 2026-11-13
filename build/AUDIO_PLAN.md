@@ -1,3 +1,5 @@
+# STATUS: implemented in app 3.0.1 (see below). Remaining manual step: on-device check and APK bisect if the problem persists.
+
 # Audio robustness: investigation and fix plan (hand-off)
 
 Symptom: the Teacher's voice "randomly breaks" (cuts off, skips, goes silent, or overlaps) since some APK update. Web may be affected too.
@@ -64,3 +66,11 @@ E. **Diagnostics**: `ttsDiag` ring buffer (event, id, chunk index, ms since requ
 
 - Do not change course content or lab code. Keep the narrator API (`load/play/pause/next/prev/jump/setRate/stop/state`) stable; add hooks only.
 - Commit trailers per repo convention. Rebuild web with `python3 build_web.py --pages ../docs/app` and APK with `android/build_apk.sh VERSION_NAME VERSION_CODE APK_NAME`.
+
+## Implemented (3.0.1)
+
+- `narrate.js`: progress-aware watchdog (start/word events re-arm it), one retry then a stop with a message after 3 errors (`onFail`), idempotent end handling (duplicate `end` no longer skips a chunk), `play()` while playing is a no-op (it used to start a second voice), debounced rate changes, cancel-safe web speech (generation counter, 80 ms gap after cancel, wait once for voices, keep-alive for the 15 s Chrome cutoff, pause when the tab is hidden), audio event ring buffer (`N.diagText()`).
+- Android: new `Speaker.java` (single speech thread so stop-then-speak is ordered, waits for a starting engine, restarts a dead engine, audio focus, `onPause` stops and tells the page), error codes forwarded, `restartEngine()` bridge call.
+- App: Settings has "Copy audio log"; toasts for focus loss and engine failure; pauses on tab hide.
+- Tests: `tests/narrate_fuzz.js`, `tests/audio_ui_test.py` (web engine, web without voices, flaky Android bridge, dead engine), both added to `run_all.sh`.
+- Not covered by automation: a real Samsung/Google TTS engine. If it still breaks, press Settings > Copy audio log right after and send it.
