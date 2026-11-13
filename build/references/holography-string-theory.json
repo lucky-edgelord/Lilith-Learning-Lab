@@ -1,0 +1,28 @@
+{"course": [
+ {"title": "AdS/CFT Duality (open course): Quantum Error Correction", "url": "https://adscft.org/course/bulk-quantum-gravity/quantum-error-correction/", "note": "The lesson whose outline chapter 10 follows; the surrounding course covers the foundations and bulk reconstruction."},
+ {"title": "Yi-Zhuang You: Tensor Network Holography and Deep Learning (Perimeter Institute, PIRSA:17110111)", "url": "https://pirsa.org/17110111", "note": "The talk behind chapter 11: entanglement feature learning and emergent hyperbolic geometry."},
+ {"title": "J. Maldacena, The Large N Limit of Superconformal Field Theories and Supergravity", "url": "https://arxiv.org/abs/hep-th/9711200", "note": "The paper that proposed AdS/CFT."},
+ {"title": "D. Harlow, TASI Lectures on the Emergence of Bulk Physics in AdS/CFT", "url": "https://arxiv.org/abs/1802.01040", "note": "Standard introduction to bulk reconstruction and error correction."},
+ {"title": "D. Harlow, Jerusalem Lectures on Black Holes and Quantum Information", "url": "https://arxiv.org/abs/1409.1231", "note": "Black holes, entropy and the information problem."}
+], "chapters": {
+ "1": [{"title": "G. 't Hooft, Dimensional Reduction in Quantum Gravity", "url": "https://arxiv.org/abs/gr-qc/9310026", "note": "The holographic principle."},
+       {"title": "L. Susskind, The World as a Hologram", "url": "https://arxiv.org/abs/hep-th/9409089", "note": "The holographic principle, named and developed."}],
+ "5": [{"title": "J. Maldacena, The Large N Limit of Superconformal Field Theories and Supergravity", "url": "https://arxiv.org/abs/hep-th/9711200", "note": "D3-branes and AdS5 x S5."}],
+ "6": [{"title": "E. Witten, Anti de Sitter Space and Holography", "url": "https://arxiv.org/abs/hep-th/9802150", "note": "The dictionary and Witten diagrams."},
+       {"title": "S. Gubser, I. Klebanov, A. Polyakov, Gauge Theory Correlators from Non-Critical String Theory", "url": "https://arxiv.org/abs/hep-th/9802109", "note": "The other half of the GKPW rule."}],
+ "7": [{"title": "S. Ryu, T. Takayanagi, Holographic Derivation of Entanglement Entropy from AdS/CFT", "url": "https://arxiv.org/abs/hep-th/0603001", "note": "The RT formula."},
+       {"title": "M. Van Raamsdonk, Building up spacetime with quantum entanglement", "url": "https://arxiv.org/abs/1005.3035", "note": "Space from entanglement."}],
+ "8": [{"title": "J. Maldacena, L. Susskind, Cool horizons for entangled black holes", "url": "https://arxiv.org/abs/1306.0533", "note": "ER = EPR."}],
+ "9": [{"title": "B. Swingle, Entanglement Renormalization and Holography", "url": "https://arxiv.org/abs/0905.1317", "note": "MERA as a discrete AdS."},
+       {"title": "F. Pastawski, B. Yoshida, D. Harlow, J. Preskill, Holographic quantum error-correcting codes", "url": "https://arxiv.org/abs/1503.06237", "note": "The HaPPY code."},
+       {"title": "P. Hayden et al., Holographic duality from random tensor networks", "url": "https://arxiv.org/abs/1601.01694", "note": "Random tensor networks and the Ising mapping."}],
+ "10": [{"title": "A. Almheiri, X. Dong, D. Harlow, Bulk Locality and Quantum Error Correction in AdS/CFT", "url": "https://arxiv.org/abs/1411.7041", "note": "The bulk as a code; the three-qutrit example."},
+        {"title": "AdS/CFT Duality (open course): Quantum Error Correction", "url": "https://adscft.org/course/bulk-quantum-gravity/quantum-error-correction/", "note": "Lesson with exercises."}],
+ "11": [{"title": "Y.-Z. You, Z. Yang, X.-L. Qi, Machine Learning Spatial Geometry from Entanglement Features", "url": "https://arxiv.org/abs/1709.01223", "note": "Entanglement feature learning."},
+        {"title": "Yi-Zhuang You, Tensor Network Holography and Deep Learning (PIRSA:17110111)", "url": "https://pirsa.org/17110111", "note": "The Perimeter Institute talk."},
+        {"title": "K. Hashimoto, S. Sugishita, A. Tanaka, A. Tomiya, Deep Learning and AdS/CFT", "url": "https://arxiv.org/abs/1802.08313", "note": "The bulk as a deep network."},
+        {"title": "P. Mehta, D. Schwab, An exact mapping between the Variational Renormalization Group and Deep Learning", "url": "https://arxiv.org/abs/1410.3831", "note": "RG and restricted Boltzmann machines."}],
+ "12": [{"title": "G. Penington, Entanglement Wedge Reconstruction and the Information Paradox", "url": "https://arxiv.org/abs/1905.08255", "note": "The Page curve from quantum extremal surfaces."},
+        {"title": "A. Almheiri, N. Engelhardt, D. Marolf, H. Maxfield, The entropy of bulk quantum fields and the entanglement wedge of an evaporating black hole", "url": "https://arxiv.org/abs/1905.08762", "note": "Islands."}],
+ "13": [{"title": "T. Faulkner et al., Gravitation from Entanglement in Holographic CFTs", "url": "https://arxiv.org/abs/1312.7856", "note": "Einstein's equations from entanglement."}]
+}}

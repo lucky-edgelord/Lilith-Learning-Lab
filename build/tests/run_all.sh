@@ -14,6 +14,7 @@ step "AI UI" python3 tests/ai_ui_test.py "$WEB" ../courses "$SHOTS"
 step "C64 machine" node c64c/c64lab/test_machine.js
 step "C64 labs (BASIC + asm)" bash -c "python3 c64c/export_labs.py >/dev/null && node c64c/c64lab/test_labs.js"
 step "C64 labs (C, cc65)" python3 c64c/c64lab/test_c_labs.py
+step "holography labs" python3 holo/tests/test_labs.py
 step "narrator fuzz" node tests/narrate_fuzz.js
 step "audio UI" python3 tests/audio_ui_test.py "$WEB" ../courses
 step "app UI" python3 tests/ui_test.py "$WEB" ../courses "$SHOTS"

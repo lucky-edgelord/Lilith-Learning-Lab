@@ -454,5 +454,22 @@
    "systems",
    "labs"
   ]
+ ],
+ "holography-string-theory": [
+  "Physics",
+  "Intermediate",
+  [
+   "holography",
+   "AdS/CFT",
+   "string theory",
+   "black holes",
+   "entanglement",
+   "Ryu-Takayanagi",
+   "tensor networks",
+   "quantum error correction",
+   "deep learning",
+   "hyperbolic geometry",
+   "Page curve"
+  ]
  ]
 }
